@@ -78,91 +78,9 @@ export default function Home(){
                 <View style={styles.body}>
                     <View style={styles.bodyBox}>
                         <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}><Ionicons name="eye" size={24} color="black" /></TouchableOpacity>
+                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}>
+                            <Ionicons name="folder-open-sharp" size={24} color="black" />
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
