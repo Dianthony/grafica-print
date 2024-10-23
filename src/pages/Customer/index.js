@@ -8,7 +8,7 @@ import { View,
          TouchableOpacity, 
          Image, 
          Modal,
-         ScrollView } from 'react-native';
+         TextInput } from 'react-native';
 
 import { useNavigation } from "@react-navigation/native"
 
@@ -71,10 +71,31 @@ export default function Customer(){
              <Image style={styles.logo} source={require('../../assets/logo.png')}/>
             </View>
 
-            <View style={styles.body}>
+            <View style={styles.register}>
                 <Text style={styles.title}>CADASTRAR CLIENTE</Text>
+
+                <View style={styles.registerForm}>
+                    <View style={styles.bodyForm}>
+                        <View style={styles.form}>
+                            <Text style={styles.formText} >Nome</Text>
+                            <TextInput style={styles.formInput} placeholder='Nome do Cliente' placeholderTextColor="#6B6967"/>
+                        </View>
+                        <View style={styles.form}>
+                            <Text style={styles.formText}>Endereço</Text>
+                            <TextInput style={styles.formInput}  placeholder='Endereço do Cliente' placeholderTextColor="#6B6967"/>
+                        </View>
+                        <View style={styles.form}>
+                            <Text style={styles.formText}>Contato</Text>
+                            <TextInput style={styles.formInput} placeholder='(XX) X.XXXX-XXXX' placeholderTextColor="#6B6967"/>
+                        </View>
+                        <View style={styles.form}>
+                            <TouchableOpacity style={styles.formBtnSave}>
+                                <Ionicons name="save" size={24} color="#1C1D21"/><Text style={styles.formBtnSaveText}>Salvar Cliente</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
             </View>
-            
         </View>
     );}
 
@@ -166,6 +187,8 @@ const styles = StyleSheet.create({
         display:'flex',
         marginLeft: 1,
     },
+
+    // SCREEN BODY STYLE
     title:{
         marginTop:30,
         fontSize:25,
@@ -173,32 +196,44 @@ const styles = StyleSheet.create({
         color:"#fff",
         textAlign:'center'
     },
-    bodyBox:{
-        flexDirection:"row",
-        justifyContent:'space-between',
-        alignItems:'center',
-        paddingLeft:30,
-        paddingRight:30,
-        paddingBottom:5,
-        paddingTop:5,
-        width:'90%',
-        marginTop:10,
-        borderWidth:1,
-        borderColor: '#F98402',
-        borderRadius:5
+    bodyForm:{
+        gap:15,
+        paddingLeft:20,
+        paddingRight:20,
+        marginTop:30
     },
-    bodyText:{
+    form:{
+        gap:5
+    },
+    formText:{
+        color:'#FFF',
         fontSize:20,
-        color:"#FFF",
+        fontWeight: 'bold'
     },
-    bodyButton:{
-        backgroundColor: "#F98402",
-        width:35, 
-        height:35,
-        alignItems:'center',
+    formInput:{
+        width:'100%',
+        padding:5,
+        paddingLeft:20,
+        borderWidth:1,
+        borderColor: "#F98402",
+        borderRadius: 5,
+        color:'#F98402',
+        fontSize:20,
+        fontWeight: 'bold'
+    },
+    formBtnSave:{
+        marginTop:20,
+        flexDirection:'row',
         justifyContent:'center',
+        textAlign:'center',
+        gap:10,
+        backgroundColor:'#F98402',
+        padding:5,
         borderRadius:5
-    }
+    },
+    formBtnSaveText:{
+        fontSize:20, 
+        fontWeight:'bold'
+    },
 
-    // SCREEN BODY STYLE
 })
