@@ -1,11 +1,44 @@
 import React from "react";
-import { View, StyleSheet, StatusBar, Text, Image, TextInput, TouchableOpacity} from 'react-native';
-
+import { useState } from 'react';
+import { View, StyleSheet, StatusBar, Text, Image, Keyboard, TextInput, TouchableOpacity} from 'react-native';
+import config from "../../../config/config.json"
 import { useNavigation } from "@react-navigation/native"
 
 export default function SingIn(){
 
     const navigation = useNavigation();
+
+    const [login, setLogin] = useState(null);
+    const [password, setPassword] = useState(null);
+    const [message, setMessage] = useState(null);
+
+    //Fazer Login
+    async function doLogin() {
+      let reqs = await fetch(config.urlRootPhp+'PROJETOS/grafica-print/Controller.php',{
+        method: 'POST',
+            headers:{
+                'Accept':'application/json',
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                loginAdmin: login,
+                passwordAdmin: password
+            })
+      });
+
+      let ress = await reqs.json();
+
+      Keyboard.dismiss();
+
+      if(ress){
+        navigation.navigate('Home')
+      }else{
+        setMessage('Credenciais Inválidas!')
+        setTimeout(()=>{
+          setMessage(null)
+        }, 3000)
+      }
+    }
 
     return(
         <View style={styles.container}>
@@ -16,13 +49,17 @@ export default function SingIn(){
 
       <Image style={styles.logo} source={require('../../assets/logo.png')}/>
       
-      <TextInput style={styles.login} placeholder='Login'  placeholderTextColor="#6B6967"/>
+      <TextInput style={styles.login} placeholder='Login'  placeholderTextColor="#6B6967" onChangeText={(login) => setLogin(login)} />
 
-      <TextInput style={styles.password} placeholder='Senha' placeholderTextColor="#6B6967"/>
+      <TextInput style={styles.password} placeholder='Senha' secureTextEntry={true} placeholderTextColor="#6B6967" onChangeText={(password) => setPassword(password)} />
 
-      <TouchableOpacity style={styles.submit} onPress={ () => navigation.navigate('Home')}>
+      <TouchableOpacity style={styles.submit} onPress={doLogin}>
         <Text style={styles.submitText}>Entrar</Text>
       </TouchableOpacity>
+
+      {message && (
+          <Text>{message}</Text>
+      )}
 
     </View>
   )

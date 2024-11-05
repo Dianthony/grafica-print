@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import config from "../../../config/config.json"
 import { View, 
          Text, 
          StyleSheet, 
@@ -20,7 +21,33 @@ export default function Customer(){
 
     const [openMenu, setOpenMenu] = useState(false)
 
+    const [name, setName] = useState(null);
+    const [address, setAddress] = useState(null);
+    const [contact, setContact] = useState(null);
+    const [message, setMessage] = useState(null);
+
+    //Envia os dados de cadastro para o backend
+
+    async function registerCustomer() {
+        let reqs = await fetch(config.urlRootNode+'create',{
+            method: 'POST',
+            headers:{
+                'Accept':'application/json',
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify({
+                nameCustomer: name,
+                addressCustomer: address,
+                contactCustomer: contact
+            })
+        })
+
+        let ress = await reqs.json();
+        setMessage(ress)
+    }
+
     return( 
+        
         <View style={styles.container}>
             <StatusBar backgroundColor={'#1C1D21'} barStyle={'light-content'} />
             <Modal 
@@ -74,22 +101,26 @@ export default function Customer(){
             <View style={styles.register}>
                 <Text style={styles.title}>CADASTRAR CLIENTE</Text>
 
+                {message && (
+                    <Text>{message}</Text>
+                )}
+
                 <View style={styles.registerForm}>
                     <View style={styles.bodyForm}>
                         <View style={styles.form}>
                             <Text style={styles.formText} >Nome</Text>
-                            <TextInput style={styles.formInput} placeholder='Nome do Cliente' placeholderTextColor="#6B6967"/>
+                            <TextInput style={styles.formInput} placeholder='Nome do Cliente' placeholderTextColor="#6B6967" onChangeText={(text) => setName(text)} />
                         </View>
                         <View style={styles.form}>
                             <Text style={styles.formText}>Endereço</Text>
-                            <TextInput style={styles.formInput}  placeholder='Endereço do Cliente' placeholderTextColor="#6B6967"/>
+                            <TextInput style={styles.formInput}  placeholder='Endereço do Cliente' placeholderTextColor="#6B6967" onChangeText={(text) => setAddress(text)} />
                         </View>
                         <View style={styles.form}>
                             <Text style={styles.formText}>Contato</Text>
-                            <TextInput style={styles.formInput} placeholder='(XX) X.XXXX-XXXX' placeholderTextColor="#6B6967"/>
+                            <TextInput style={styles.formInput} placeholder='(XX) X.XXXX-XXXX' placeholderTextColor="#6B6967" onChangeText={(text) => setContact(text)}/>
                         </View>
                         <View style={styles.form}>
-                            <TouchableOpacity style={styles.formBtnSave}>
+                            <TouchableOpacity style={styles.formBtnSave} onPress={registerCustomer}>
                                 <Ionicons name="save" size={24} color="#1C1D21"/><Text style={styles.formBtnSaveText}>Salvar Cliente</Text>
                             </TouchableOpacity>
                         </View>
