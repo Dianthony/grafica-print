@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, 
          Text, 
          StyleSheet, 
@@ -12,16 +12,30 @@ import { View,
          TextInput } from 'react-native';
 
 import { useNavigation } from "@react-navigation/native"
+import axios from 'axios';
+import config from "../../../config/config.json"
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function Debts(){
+export default function Debts({route}){
 
     const navigation = useNavigation();
 
     const [edit, setEdit] = useState(false);
     const [debt, setDebt] = useState(false);
     const [editDebt, setEditDebt] = useState(false);
+    
+
+    useEffect(() =>{
+        saerchCustomer();
+    },[])
+
+    async function saerchCustomer() {
+        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/debts.php?id='+route.params.id);
+        console.log(reqs.data.result)   
+    }
+
+
 
     return( 
         <View style={styles.container}>
@@ -41,15 +55,15 @@ export default function Debts(){
                             <View style={styles.bodyForm}>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Nome</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >Nome do Cliente</Text></TextInput>
+                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >{route.params.name}</Text></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Endereço</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >Endereço do Cliente</Text></TextInput>
+                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >{route.params.address}</Text></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Contato</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >(XX) X.XXXX-XXXX</Text></TextInput>
+                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >{route.params.contact}</Text></TextInput>
                                 </View>
                             </View>
                         </View>
@@ -156,7 +170,7 @@ export default function Debts(){
                 {/* VIEW DE CABEÇALHO DO CORPO DA PÁGINA */}
                 <View style={styles.body}>
                     <View style={styles.customer}>
-                        <Text style={styles.customerName}>NOME DO CLIENTE</Text>
+                        <Text style={styles.customerName}>{route.params.name}</Text>
                         {/* BOTÃO PARA ABRIR MODAL DE EDIÇÃO DOS DADOS DO CLIENTE */}
                         <TouchableOpacity style={styles.bodyButton} onPress={() => setEdit(true)}>
                             <Ionicons name="pencil-sharp" size={24} color="black" />
@@ -164,8 +178,8 @@ export default function Debts(){
                     </View>
                     {/* VIEW QUE CONTÉM OS DADOS DO CLIENTE */}
                     <View style={styles.customerInfo}>
-                        <Text style={styles.primaryText}>Endereço:</Text>
-                        <Text style={styles.primaryText}>Contato: <Text style={styles.secondText}>(XX) X.XXXX-XXXX</Text></Text>
+                        <Text style={styles.primaryText}>Endereço: {route.params.address}</Text>
+                        <Text style={styles.primaryText}>Contato: <Text style={styles.secondText}>{route.params.contact}</Text></Text>
                         <Text style={styles.primaryText}>Débito Total: <Text style={styles.secondText}>R$ XXX,XX</Text></Text>
                     </View>
 

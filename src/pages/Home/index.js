@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, 
          Text, 
          StyleSheet, 
@@ -11,6 +11,8 @@ import { View,
          ScrollView } from 'react-native';
 
 import { useNavigation } from "@react-navigation/native"
+import axios from 'axios';
+import config from "../../../config/config.json"
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -19,6 +21,21 @@ export default function Home(){
     const navigation = useNavigation();
 
     const [openMenu, setOpenMenu] = useState(false)
+    const [customer, setCustomer] = useState([])
+
+    useEffect(() =>{
+        listCustomer();
+    },[])
+
+    async function listCustomer() {
+        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/customer.php');
+        setCustomer(reqs.data.result)
+        console.log(reqs.data.result)
+    }
+
+    async function infoCustomer(idCustomer, nameCustomer, addressCustomer, contactCustomer){
+        navigation.navigate("Debts", {id: idCustomer, name: nameCustomer, address: addressCustomer, contact:contactCustomer})
+    }
 
     return(
         <View style={styles.container}>
@@ -76,12 +93,17 @@ export default function Home(){
 
             <ScrollView>
                 <View style={styles.body}>
-                    <View style={styles.bodyBox}>
-                        <Text style={styles.bodyText}>Cliente 1</Text>
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => navigation.navigate('Debts')}>
-                            <Ionicons name="folder-open-sharp" size={24} color="black" />
+                    
+
+                    {customer.map(item =>(
+                        <View style={styles.bodyBox}>
+                        <Text style={styles.bodyText}>{item.name}</Text>
+                        <TouchableOpacity style={styles.bodyButton} key={item.id} onPress={() => infoCustomer(item.id, item.name, item.address, item.contact)}>
+                        <Ionicons name="folder-open-sharp" size={24} color="black" />
                         </TouchableOpacity>
-                    </View>
+                        </View>
+                    ))}
+
                 </View>
             </ScrollView>
         </View>

@@ -53,7 +53,7 @@ export default function SingIn(){
 
       <TextInput style={styles.password} placeholder='Senha' secureTextEntry={true} placeholderTextColor="#6B6967" onChangeText={(password) => setPassword(password)} />
 
-      <TouchableOpacity style={styles.submit} onPress={doLogin}>
+      <TouchableOpacity style={styles.submit} onPress={() => navigation.navigate('Home')}>
         <Text style={styles.submitText}>Entrar</Text>
       </TouchableOpacity>
 
