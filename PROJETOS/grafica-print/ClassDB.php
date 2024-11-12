@@ -12,7 +12,7 @@
             }
         }
 
-        #verificar op login
+        #verificar o login
         
         public function verifyLogin($admin, $pass){
             $b = $this->conectDB()->prepare("SELECT * FROM admins WHERE login=? and password=?");
@@ -21,5 +21,7 @@
             $b->execute();
             return($b->rowCount() > 0)?true:false;
         }
+    
+        
     }
 ?>
