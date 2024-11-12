@@ -11,19 +11,41 @@ import { View,
          ScrollView,
          TextInput } from 'react-native';
 
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useTheme } from "@react-navigation/native"
 import axios from 'axios';
 import config from "../../../config/config.json"
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { SearchBar } from 'react-native-screens';
 
 export default function Debts({route}){
 
     const navigation = useNavigation();
 
+    const[message, setMessage] = useState();
+    const[verify, setVerify] = useState();
+
     const [edit, setEdit] = useState(false);
     const [debt, setDebt] = useState(false);
     const [editDebt, setEditDebt] = useState(false);
+
+    const [listDebt, setListDebt] = useState([])
+    const [customer, setCustomer] = useState([])
+
+    const [newName, setNewName] = useState(null)
+    const [newAddress, setNewAddress] = useState(null)
+    const [newContact, setNewContact] = useState(null)
+
+    const [newDebtTitle, setNewDebtTitle] = useState(null)
+    const [newDebtDesc, setNewDebtDesc] = useState(null)
+    const [newDebtValue, setNewDebtValue] = useState(null)
+    const [newDebtDate, setNewDebtDate] = useState(null)
+
+    const [debtTitle, setDebtTitle] = useState(null)
+    const [debtDesc, setDebtDesc] = useState(null)
+    const [debtValue, setDebtValue] = useState(null)
+    const [debtDate, setDebtDate] = useState(null)
+
     
 
     useEffect(() =>{
@@ -32,7 +54,110 @@ export default function Debts({route}){
 
     async function saerchCustomer() {
         const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/debts.php?id='+route.params.id);
-        console.log(reqs.data.result)   
+        setListDebt(reqs.data.result)
+        setCustomer(reqs.data.customer)
+    }
+
+    async function updateCustomer() {
+        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/updatecustomer.php?id='+route.params.id+'&newname='+newName+'&newaddress='+newAddress+'&newcontact='+newContact);
+        saerchCustomer();
+        setEdit(false)
+
+        let ress = await reqs;
+
+        if(ress){
+            setMessage('Alterado com sucesso!')
+            setTimeout(()=>{
+                setMessage(null)
+              }, 3000)
+        }else{
+          setMessage('Erro desconhecido')
+          setTimeout(()=>{
+            setMessage(null)
+          }, 3000)
+        }
+    }
+
+    async function addDebt() {
+        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/adddebt.php?id='+route.params.id+'&title='+debtTitle+'&desc='+debtDesc+'&value='+debtValue+'&date='+debtDate);
+        saerchCustomer();
+        setDebt(false)
+        console.log(reqs)
+    }
+
+    async function updateDebt() {
+        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/updatedebt.php?id='+route.params.id+'&title='+newDebtTitle+'&desc='+debtDesc+'&value='+debtValue+'&date='+debtDate);
+        saerchCustomer();
+        setEditDebt(false)
+
+        let ress = await reqs;
+
+        if(ress){
+            setMessage('Alterado com sucesso!')
+            setTimeout(()=>{
+                setMessage(null)
+              }, 3000)
+        }else{
+          setMessage('Erro desconhecido')
+          setTimeout(()=>{
+            setMessage(null)
+          }, 3000)
+        }
+    }
+
+    async function daleteDebt(idDebt) {
+        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletedebt.php?iddebt='+idDebt);
+        console.log(idDebt)
+        saerchCustomer();
+
+        let ress = await reqs;
+
+        if(ress){
+            setMessage('Deletado com sucesso!')
+            setTimeout(()=>{
+                setMessage(null)
+              }, 3000)
+        }else{
+          setMessage('Erro desconhecido')
+          setTimeout(()=>{
+            setMessage(null)
+          }, 3000)
+        }
+    }
+
+    
+    const Render = () =>{
+        if (listDebt != 0){
+            console.log(listDebt)
+            return listDebt.map(item  => (
+                <View style={styles.register}>
+                
+                <View style={styles.customerRegister}>
+                    <Text style={styles.customerRegisterTitle}>{item.title}</Text>
+                    <View style={styles.customerRegisterActions}>
+                        {/* BOTÃO PARA DELETAR O DÉBITO EM ESPECÍFICO E DESCONTAR DA SUA CONTA */}
+                        <TouchableOpacity style={styles.bodyButton} key={item.id} onPress={() => daleteDebt(item.id)}>
+                            <Ionicons name="trash-sharp" size={24} color="black" />
+                        </TouchableOpacity>
+                        {/* BOTÃO PARA ABRIR MODAL DE EDIÇÃO DOS DÉBITOS DO CLIENTE */}
+                        <TouchableOpacity style={styles.bodyButton} onPress={() => setEditDebt(true)}>
+                            <Ionicons name="pencil-sharp" size={24} color="black" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                {/* VIEW DE DADOS DOS DÉBITOS */}
+                
+                <View style={styles.customerRegisterInfo}>
+                    <Text style={styles.primaryText}>{item.desc}</Text>
+                    <Text style={styles.primaryText}>Valor: <Text style={styles.secondText}>R$ {item.value}</Text></Text>
+                    <Text style={styles.primaryText}>Data: <Text style={styles.secondText}>{item.date}</Text></Text>
+                </View>
+            </View>
+            
+            ))
+        } else if(listDebt == 0) {
+            return <Text>Nenhum Registro</Text>
+        }
     }
 
 
@@ -52,23 +177,25 @@ export default function Debts({route}){
                             </TouchableOpacity>
                         </View>
                         <View style={styles.modalBody}>
-                            <View style={styles.bodyForm}>
+                            {customer.map(item =>(
+                                <View style={styles.bodyForm}>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Nome</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >{route.params.name}</Text></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(newName) => setNewName(newName)}><Text style={styles.formTextInput}>{item.name}</Text></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Endereço</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >{route.params.address}</Text></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(newAddress) => setNewAddress(newAddress)}><Text style={styles.formTextInput} >{item.address}</Text></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Contato</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >{route.params.contact}</Text></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(newContact) => setNewContact(newContact)}><Text style={styles.formTextInput} >{item.contact}</Text></TextInput>
                                 </View>
                             </View>
+                            ))}
                         </View>
                         <View style={styles.modalFooter}>
-                            <TouchableOpacity style={styles.editBtnSave}>
+                            <TouchableOpacity style={styles.editBtnSave} onPress={updateCustomer}>
                                 <Ionicons name="save" size={24} color="#1C1D21"/><Text style={styles.editBtnSaveText}>Salvar Alterações</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.editBtnDelete}>
@@ -90,26 +217,27 @@ export default function Debts({route}){
                             </TouchableOpacity>
                         </View>
                         <View style={styles.modalBody}>
+                            
                             <View style={styles.bodyForm}>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Título</Text>
-                                    <TextInput style={styles.formInput}></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(debtTitle => setDebtTitle(debtTitle))}></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Descrição</Text>
-                                    <TextInput style={styles.formInput} multiline placeholder='Descreva o serviço'  placeholderTextColor="#6B6967"></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(debtDesc => setDebtDesc(debtDesc))} multiline placeholder='Descreva o serviço'  placeholderTextColor="#6B6967"></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Valor</Text>
-                                    <TextInput style={styles.formInput} placeholder='R$ XX,XX'  placeholderTextColor="#6B6967"></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(debtValue => setDebtValue(debtValue))} placeholder='R$ XX,XX'  placeholderTextColor="#6B6967"></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Data</Text>
-                                    <TextInput style={styles.formInput} placeholder='XX/XX/XXXX'  placeholderTextColor="#6B6967"></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(debtDate => setDebtDate(debtDate))} placeholder='XX/XX/XXXX'  placeholderTextColor="#6B6967"></TextInput>
                                 </View>
                             </View>
                             <View style={styles.modalFooter}>
-                            <TouchableOpacity style={styles.editBtnSave}>
+                            <TouchableOpacity style={styles.editBtnSave} onPress={addDebt}>
                                 <Ionicons name="save" size={24} color="#1C1D21"/><Text style={styles.editBtnSaveText}>Salvar Alterações</Text>
                             </TouchableOpacity>
                         </View>
@@ -132,23 +260,23 @@ export default function Debts({route}){
                             <View style={styles.bodyForm}>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Título</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >Serviço 1</Text></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(newDebtTitle) => setNewDebtTitle(newDebtTitle)}><Text style={styles.formTextInput} >Serviço 1</Text></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Descrição</Text>
-                                    <TextInput style={styles.formInput} multiline> <Text style={styles.formTextInput} >Breve descrição do serviço</Text></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(newDebtDesc) => setNewDebtDesc(newDebtDesc)} multiline> <Text style={styles.formTextInput} >Breve descrição do serviço</Text></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Valor</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >R$ X,XX</Text></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(newDebtVasetNewDebtValue) =>setNewDebtValue(newDebtVasetNewDebtValue)}><Text style={styles.formTextInput} >R$ X,XX</Text></TextInput>
                                 </View>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Data</Text>
-                                    <TextInput style={styles.formInput}><Text style={styles.formTextInput} >XX/XX/XXXX</Text></TextInput>
+                                    <TextInput style={styles.formInput} onChangeText={(newDebtDate) => setNewDebDatee(newDebtDate)}><Text style={styles.formTextInput} >XX/XX/XXXX</Text></TextInput>
                                 </View>
                             </View>
                             <View style={styles.modalFooter}>
-                            <TouchableOpacity style={styles.editBtnSave}>
+                            <TouchableOpacity style={styles.editBtnSave} onPress={updateDebt}>
                                 <Ionicons name="save" size={24} color="#1C1D21"/><Text style={styles.editBtnSaveText}>Salvar Alterações</Text>
                             </TouchableOpacity>
                         </View>
@@ -168,58 +296,47 @@ export default function Debts({route}){
             {/* VIEW COM ROLAMENTO DO CORPO DA PÁGINA */}
             <ScrollView>
                 {/* VIEW DE CABEÇALHO DO CORPO DA PÁGINA */}
-                <View style={styles.body}>
-                    <View style={styles.customer}>
-                        <Text style={styles.customerName}>{route.params.name}</Text>
-                        {/* BOTÃO PARA ABRIR MODAL DE EDIÇÃO DOS DADOS DO CLIENTE */}
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => setEdit(true)}>
-                            <Ionicons name="pencil-sharp" size={24} color="black" />
-                        </TouchableOpacity>
-                    </View>
-                    {/* VIEW QUE CONTÉM OS DADOS DO CLIENTE */}
-                    <View style={styles.customerInfo}>
-                        <Text style={styles.primaryText}>Endereço: {route.params.address}</Text>
-                        <Text style={styles.primaryText}>Contato: <Text style={styles.secondText}>{route.params.contact}</Text></Text>
-                        <Text style={styles.primaryText}>Débito Total: <Text style={styles.secondText}>R$ XXX,XX</Text></Text>
-                    </View>
-
-                    {/* VIEW DESTINADO AO REGISTRO DE DÉBITOS DO CLEINTE */}
-                    <Text style={styles.customerRegisterText}>REGISTROS</Text>
-                    <View style={styles.customerActions}>
-                        {/* BOTÃO PARA DELETAR TODOS OS DÉBITOS DO CLIENTE E ZERAR SUA CONTA */}
-                        <TouchableOpacity style={styles.btnAction}>
-                            <Ionicons name="remove-circle" size={24} color="black" />
-                            <Text style={styles.btnActionText}>Apagar Registros</Text>
-                        </TouchableOpacity>
-                        {/* BOTÃO PARA ABRIR MODAL DE REGISTRO DE NOVOS DÉBITOS DO CLIENTE */}
-                        <TouchableOpacity style={styles.btnAction} onPress={() => setDebt(true)}>
-                            <Ionicons name="create" size={24} color="black"/>
-                            <Text style={styles.btnActionText}>Novo Registro</Text>
-                        </TouchableOpacity>
-                    </View>
-                    {/* VIEW DE DÉBITOS DO CLIENTE */}
-                    <View style={styles.register}>
-                        <View style={styles.customerRegister}>
-                            <Text style={styles.customerRegisterTitle}>Serviço 1</Text>
-                            <View style={styles.customerRegisterActions}>
-                                {/* BOTÃO PARA DELETAR O DÉBITO EM ESPECÍFICO E DESCONTAR DA SUA CONTA */}
-                                <TouchableOpacity style={styles.bodyButton}>
-                                    <Ionicons name="trash-sharp" size={24} color="black" />
-                                </TouchableOpacity>
-                                {/* BOTÃO PARA ABRIR MODAL DE EDIÇÃO DOS DÉBITOS DO CLIENTE */}
-                                <TouchableOpacity style={styles.bodyButton} onPress={() => setEditDebt(true)}>
-                                    <Ionicons name="pencil-sharp" size={24} color="black" />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        {/* VIEW DE DADOS DOS DÉBITOS */}
-                        <View style={styles.customerRegisterInfo}>
-                            <Text style={styles.primaryText}>Breve Descrição do Serviço</Text>
-                            <Text style={styles.primaryText}>Valor: <Text style={styles.secondText}>R$ XXX,XX</Text></Text>
-                            <Text style={styles.primaryText}>Data: <Text style={styles.secondText}>XX/XX/XXXX</Text></Text>
-                        </View>
-                    </View>
-                </View>
+                {customer.map(item => (
+                       <View style={styles.body}>
+                        {message && (
+                            <Text>{message}</Text>
+                        )}
+                    
+                       <View style={styles.customer}>
+                           <Text style={styles.customerName}>{item.name}</Text>
+                           {/* BOTÃO PARA ABRIR MODAL DE EDIÇÃO DOS DADOS DO CLIENTE */}
+                           <TouchableOpacity style={styles.bodyButton} onPress={() => setEdit(true)}>
+                               <Ionicons name="pencil-sharp" size={24} color="black" />
+                           </TouchableOpacity>
+                       </View>
+                       {/* VIEW QUE CONTÉM OS DADOS DO CLIENTE */}
+                       <View style={styles.customerInfo}>
+                           <Text style={styles.primaryText}>Endereço: {item.address}</Text>
+                           <Text style={styles.primaryText}>Contato: <Text style={styles.secondText}>{item.contact}</Text></Text>
+                           <Text style={styles.primaryText}>Débito Total: <Text style={styles.secondText}>R$ XXX,XX</Text></Text>
+                       </View>
+   
+                       {/* VIEW DESTINADO AO REGISTRO DE DÉBITOS DO CLEINTE */}
+                       <Text style={styles.customerRegisterText}>REGISTROS</Text>
+                       <View style={styles.customerActions}>
+                           {/* BOTÃO PARA DELETAR TODOS OS DÉBITOS DO CLIENTE E ZERAR SUA CONTA */}
+                           <TouchableOpacity style={styles.btnAction}>
+                               <Ionicons name="remove-circle" size={24} color="black" />
+                               <Text style={styles.btnActionText}>Apagar Registros</Text>
+                           </TouchableOpacity>
+                           {/* BOTÃO PARA ABRIR MODAL DE REGISTRO DE NOVOS DÉBITOS DO CLIENTE */}
+                           <TouchableOpacity style={styles.btnAction} onPress={() => setDebt(true)}>
+                               <Ionicons name="create" size={24} color="black"/>
+                               <Text style={styles.btnActionText}>Novo Registro</Text>
+                           </TouchableOpacity>
+                       </View>
+                       {/* VIEW DE DÉBITOS DO CLIENTE */}
+   
+                       <Render />
+                       
+                   </View> 
+                    ))}
+                
             </ScrollView>
         </View>
     );}
