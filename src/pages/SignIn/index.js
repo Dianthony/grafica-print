@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { View, StyleSheet, StatusBar, Text, Image, Keyboard, TextInput, TouchableOpacity} from 'react-native';
 import config from "../../../config/config.json"
 import { useNavigation } from "@react-navigation/native"
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function SingIn(){
 
@@ -14,52 +15,66 @@ export default function SingIn(){
 
     //Fazer Login
     async function doLogin() {
-      let reqs = await fetch(config.urlRootPhp+'PROJETOS/grafica-print/Controller.php',{
-        method: 'POST',
-            headers:{
-                'Accept':'application/json',
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify({
-                loginAdmin: login,
-                passwordAdmin: password
-            })
-      });
 
-      let ress = await reqs.json();
-
-      Keyboard.dismiss();
-
-      if(ress){
-        navigation.navigate('Home')
-      }else{
-        setMessage('Credenciais Inválidas!')
+      if(login == null || password == null || login == '' || password == ''){
+        setMessage('Preencha Todos os campos')
         setTimeout(()=>{
           setMessage(null)
         }, 3000)
       }
+      else {
+        let reqs = await fetch(config.urlRootPhp+'PROJETOS/grafica-print/Controller.php',{
+          method: 'POST',
+              headers:{
+                  'Accept':'application/json',
+                  'Content-Type':'application/json'
+              },
+              body: JSON.stringify({
+                  loginAdmin: login,
+                  passwordAdmin: password
+              })
+        });
+  
+        let ress = await reqs.json();
+  
+        Keyboard.dismiss();
+  
+        
+  
+        if(ress){
+          navigation.navigate('Home')
+        }else{
+          setMessage('Credenciais Inválidas!')
+          setTimeout(()=>{
+            setMessage(null)
+          }, 3000)
+        } 
+      }
     }
 
     return(
-        <View style={styles.container}>
-      <StatusBar 
-          backgroundColor={'#1C1D21'} 
-          barStyle={'light-content'} 
-      />
+      <View style={styles.container}>
+        <StatusBar 
+            backgroundColor={'#1C1D21'} 
+            barStyle={'light-content'} 
+        />
 
-      <Image style={styles.logo} source={require('../../assets/logo.png')}/>
-      
-      <TextInput style={styles.login} placeholder='Login'  placeholderTextColor="#6B6967" onChangeText={(login) => setLogin(login)} />
+        <Image style={styles.logo} source={require('../../assets/logo.png')}/>
+        
+        <TextInput style={styles.login} placeholder='Login'  placeholderTextColor="#6B6967" onChangeText={(login) => setLogin(login)} />
 
-      <TextInput style={styles.password} placeholder='Senha' secureTextEntry={true} placeholderTextColor="#6B6967" onChangeText={(password) => setPassword(password)} />
+        <TextInput style={styles.password} placeholder='Senha' secureTextEntry={true} placeholderTextColor="#6B6967" onChangeText={(password) => setPassword(password)} />
 
-      <TouchableOpacity style={styles.submit} onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.submitText}>Entrar</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.submit} onPress={doLogin}>
+          <Text style={styles.submitText}>Entrar</Text>
+        </TouchableOpacity>
 
-      {message && (
-          <Text>{message}</Text>
-      )}
+        {message && (
+            <View style={styles.message}>
+              <Ionicons name="alert-circle-sharp" size={24} color="#F98402"/>
+              <Text style={styles.messageText}>{message}</Text>
+            </View>
+        )}
 
     </View>
   )
@@ -118,6 +133,23 @@ const styles = StyleSheet.create({
   },
   submitText:{
     fontSize:25, 
+    fontWeight: 'bold'
+  }, 
+  message:{
+    flexDirection:"row",
+    gap:10,
+    justifyContent:  'center',
+    alignItems: 'center',
+    marginTop:30,
+    borderWidth:1,
+    borderColor: "#F98402",
+    padding:10,
+    paddingLeft:15,
+    paddingRight:15,
+    borderRadius:5
+  },
+  messageText:{
+    color:"#F98402",
     fontWeight: 'bold'
   }
 }) 

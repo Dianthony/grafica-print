@@ -11,23 +11,20 @@ import { View,
          ScrollView,
          TextInput } from 'react-native';
 
-import { useNavigation, useTheme } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import axios from 'axios';
 import config from "../../../config/config.json"
 
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { SearchBar } from 'react-native-screens';
 
 export default function Debts({route}){
 
     const navigation = useNavigation();
 
     const[message, setMessage] = useState();
-    const[verify, setVerify] = useState();
 
     const [edit, setEdit] = useState(false);
     const [debt, setDebt] = useState(false);
-    const [editDebt, setEditDebt] = useState(false);
 
     const [listDebt, setListDebt] = useState([])
     const [customer, setCustomer] = useState([])
@@ -35,11 +32,6 @@ export default function Debts({route}){
     const [newName, setNewName] = useState(null)
     const [newAddress, setNewAddress] = useState(null)
     const [newContact, setNewContact] = useState(null)
-
-    const [newDebtTitle, setNewDebtTitle] = useState(null)
-    const [newDebtDesc, setNewDebtDesc] = useState(null)
-    const [newDebtValue, setNewDebtValue] = useState(null)
-    const [newDebtDate, setNewDebtDate] = useState(null)
 
     const [debtTitle, setDebtTitle] = useState(null)
     const [debtDesc, setDebtDesc] = useState(null)
@@ -53,67 +45,115 @@ export default function Debts({route}){
     },[])
 
     async function saerchCustomer() {
-        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/debts.php?id='+route.params.id);
-        setListDebt(reqs.data.result)
-        setCustomer(reqs.data.customer)
+        try{
+            const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/debts.php?id='+route.params.id);
+
+            if(reqs.data.sucess == true){
+                setListDebt(reqs.data.result)
+            } else {
+                setListDebt([])
+            }
+            
+            setCustomer(reqs.data.customer)
+        } catch (err) {
+            console.log(err)
+        }
+        
     }
 
     async function updateCustomer() {
-        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/updatecustomer.php?id='+route.params.id+'&newname='+newName+'&newaddress='+newAddress+'&newcontact='+newContact);
-        saerchCustomer();
-        setEdit(false)
+        try{
+            const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/updatecustomer.php?id='+route.params.id+'&newname='+newName+'&newaddress='+newAddress+'&newcontact='+newContact);
+            saerchCustomer();
+            setEdit(false)
 
-        let ress = await reqs;
+            let ress = await reqs;
 
-        if(ress){
-            setMessage('Alterado com sucesso!')
+            if(ress){
+                setMessage('Alterado com sucesso!')
+                setTimeout(()=>{
+                    setMessage(null)
+                }, 3000)
+            }else{
+            setMessage('Erro desconhecido')
             setTimeout(()=>{
                 setMessage(null)
-              }, 3000)
-        }else{
-          setMessage('Erro desconhecido')
-          setTimeout(()=>{
-            setMessage(null)
-          }, 3000)
+            }, 3000)
+            }
+        } catch (err) {
+            console.log(err)
         }
+
+    }
+
+    async function deleteCustomer() {
+        try{
+            const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletecustomer.php?id='+route.params.id);
+            navigation.navigate('Home')
+
+            let ress = await reqs;
+
+            if(ress){
+                setMessage('Deletado com sucesso!')
+                setTimeout(()=>{
+                    setMessage(null)
+                }, 3000)
+            }else{
+            setMessage('Erro desconhecido')
+            setTimeout(()=>{
+                setMessage(null)
+            }, 3000)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+
     }
 
     async function addDebt() {
-        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/adddebt.php?id='+route.params.id+'&title='+debtTitle+'&desc='+debtDesc+'&value='+debtValue+'&date='+debtDate);
-        saerchCustomer();
-        setDebt(false)
-        console.log(reqs)
-    }
-
-    async function updateDebt() {
-        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/updatedebt.php?id='+route.params.id+'&title='+newDebtTitle+'&desc='+debtDesc+'&value='+debtValue+'&date='+debtDate);
-        saerchCustomer();
-        setEditDebt(false)
-
-        let ress = await reqs;
-
-        if(ress){
-            setMessage('Alterado com sucesso!')
-            setTimeout(()=>{
-                setMessage(null)
-              }, 3000)
-        }else{
-          setMessage('Erro desconhecido')
-          setTimeout(()=>{
-            setMessage(null)
-          }, 3000)
+        try{
+            const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/adddebt.php?id='+route.params.id+'&title='+debtTitle+'&desc='+debtDesc+'&value='+debtValue+'&date='+debtDate);
+            saerchCustomer();
+            setDebt(false)
+        } catch (err) {
+            console.log(err)
         }
+        
     }
 
     async function daleteDebt(idDebt) {
-        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletedebt.php?iddebt='+idDebt);
-        console.log(idDebt)
-        saerchCustomer();
+        try{
+            const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletedebt.php?iddebt='+idDebt);
+            saerchCustomer();
+
+            let ress = await reqs;
+
+            if(ress){
+                setMessage('Deletado com sucesso!')
+                setTimeout(()=>{
+                    setMessage(null)
+                }, 3000)
+            }else{
+            setMessage('Erro desconhecido')
+            setTimeout(()=>{
+                setMessage(null)
+            }, 3000)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+
+    }
+
+    async function deleteAllDebts() {
+        try{
+            const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletealldebts.php?id='+route.params.id);
+            saerchCustomer();
 
         let ress = await reqs;
 
         if(ress){
-            setMessage('Deletado com sucesso!')
+            setMessage('CONTA QUITADA!')
             setTimeout(()=>{
                 setMessage(null)
               }, 3000)
@@ -123,13 +163,14 @@ export default function Debts({route}){
             setMessage(null)
           }, 3000)
         }
+        } catch (err){
+            console.log(err)
+        }
     }
-
     
     const Render = () =>{
-        if (listDebt != 0){
-            console.log(listDebt)
-            return listDebt.map(item  => (
+        if (listDebt.length != 0){
+            return listDebt?.map(item  => (
                 <View style={styles.register}>
                 
                 <View style={styles.customerRegister}>
@@ -138,10 +179,6 @@ export default function Debts({route}){
                         {/* BOTÃO PARA DELETAR O DÉBITO EM ESPECÍFICO E DESCONTAR DA SUA CONTA */}
                         <TouchableOpacity style={styles.bodyButton} key={item.id} onPress={() => daleteDebt(item.id)}>
                             <Ionicons name="trash-sharp" size={24} color="black" />
-                        </TouchableOpacity>
-                        {/* BOTÃO PARA ABRIR MODAL DE EDIÇÃO DOS DÉBITOS DO CLIENTE */}
-                        <TouchableOpacity style={styles.bodyButton} onPress={() => setEditDebt(true)}>
-                            <Ionicons name="pencil-sharp" size={24} color="black" />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -155,8 +192,8 @@ export default function Debts({route}){
             </View>
             
             ))
-        } else if(listDebt == 0) {
-            return <Text>Nenhum Registro</Text>
+        } else if(listDebt.length == 0) {
+            return<View style={styles.message}><Ionicons name="alert-circle-sharp" size={24} color="#F98402"/><Text style={styles.secondText}>Nenhum Registro Encontrado</Text></View>
         }
     }
 
@@ -177,7 +214,7 @@ export default function Debts({route}){
                             </TouchableOpacity>
                         </View>
                         <View style={styles.modalBody}>
-                            {customer.map(item =>(
+                            {customer?.map(item =>(
                                 <View style={styles.bodyForm}>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Nome</Text>
@@ -198,7 +235,7 @@ export default function Debts({route}){
                             <TouchableOpacity style={styles.editBtnSave} onPress={updateCustomer}>
                                 <Ionicons name="save" size={24} color="#1C1D21"/><Text style={styles.editBtnSaveText}>Salvar Alterações</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.editBtnDelete}>
+                            <TouchableOpacity style={styles.editBtnDelete} onPress={deleteCustomer}> 
                                 <Ionicons name="trash-sharp" size={24} color="#F98402"/><Text style={styles.editBtnDeleteText}>Excluir Cliente</Text>
                             </TouchableOpacity>
                         </View>
@@ -246,45 +283,6 @@ export default function Debts({route}){
                 </SafeAreaView>
             </Modal>
 
-            {/* MODAL DE EDIÇÃO DE DÉBITOS DO CLIENTE */}
-            <Modal animationType="slide" transparent={true} visible={editDebt}>
-                <SafeAreaView style={styles.modal}>
-                    <View style={styles.containerModal}>
-                        <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Editar Registro</Text>
-                            <TouchableOpacity onPress={() => setEditDebt(false)}>
-                            <Ionicons name="close" size={40} color="#F98402"/>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.modalBody}>
-                            <View style={styles.bodyForm}>
-                                <View style={styles.form}>
-                                    <Text style={styles.formText} >Título</Text>
-                                    <TextInput style={styles.formInput} onChangeText={(newDebtTitle) => setNewDebtTitle(newDebtTitle)}><Text style={styles.formTextInput} >Serviço 1</Text></TextInput>
-                                </View>
-                                <View style={styles.form}>
-                                    <Text style={styles.formText} >Descrição</Text>
-                                    <TextInput style={styles.formInput} onChangeText={(newDebtDesc) => setNewDebtDesc(newDebtDesc)} multiline> <Text style={styles.formTextInput} >Breve descrição do serviço</Text></TextInput>
-                                </View>
-                                <View style={styles.form}>
-                                    <Text style={styles.formText} >Valor</Text>
-                                    <TextInput style={styles.formInput} onChangeText={(newDebtVasetNewDebtValue) =>setNewDebtValue(newDebtVasetNewDebtValue)}><Text style={styles.formTextInput} >R$ X,XX</Text></TextInput>
-                                </View>
-                                <View style={styles.form}>
-                                    <Text style={styles.formText} >Data</Text>
-                                    <TextInput style={styles.formInput} onChangeText={(newDebtDate) => setNewDebDatee(newDebtDate)}><Text style={styles.formTextInput} >XX/XX/XXXX</Text></TextInput>
-                                </View>
-                            </View>
-                            <View style={styles.modalFooter}>
-                            <TouchableOpacity style={styles.editBtnSave} onPress={updateDebt}>
-                                <Ionicons name="save" size={24} color="#1C1D21"/><Text style={styles.editBtnSaveText}>Salvar Alterações</Text>
-                            </TouchableOpacity>
-                        </View>
-                        </View>
-                    </View>
-                </SafeAreaView>
-            </Modal>
-
             {/* VIEW DESTINADA AO CABEÇALHO DA PÁGINA */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.navigate('Home')}>
@@ -296,10 +294,13 @@ export default function Debts({route}){
             {/* VIEW COM ROLAMENTO DO CORPO DA PÁGINA */}
             <ScrollView>
                 {/* VIEW DE CABEÇALHO DO CORPO DA PÁGINA */}
-                {customer.map(item => (
+                {customer?.map(item => (
                        <View style={styles.body}>
                         {message && (
-                            <Text>{message}</Text>
+                            <View style={styles.message}>
+                            <Ionicons name="alert-circle-sharp" size={24} color="#F98402"/>
+                            <Text style={styles.messageText}>{message}</Text>
+                          </View>
                         )}
                     
                        <View style={styles.customer}>
@@ -320,7 +321,7 @@ export default function Debts({route}){
                        <Text style={styles.customerRegisterText}>REGISTROS</Text>
                        <View style={styles.customerActions}>
                            {/* BOTÃO PARA DELETAR TODOS OS DÉBITOS DO CLIENTE E ZERAR SUA CONTA */}
-                           <TouchableOpacity style={styles.btnAction}>
+                           <TouchableOpacity style={styles.btnAction} onPress={deleteAllDebts}>
                                <Ionicons name="remove-circle" size={24} color="black" />
                                <Text style={styles.btnActionText}>Apagar Registros</Text>
                            </TouchableOpacity>
@@ -557,5 +558,22 @@ const styles = StyleSheet.create({
     customerRegisterInfo:{
         paddingTop:10,
         gap:5
-    }
+    },
+    message:{
+        flexDirection:"row",
+        gap:10,
+        justifyContent:  'center',
+        alignItems: 'center',
+        marginTop:30,
+        borderWidth:1,
+        borderColor: "#F98402",
+        padding:10,
+        paddingLeft:15,
+        paddingRight:15,
+        borderRadius:5
+      },
+      messageText:{
+        color:"#F98402",
+        fontWeight: 'bold'
+      }
 })

@@ -24,27 +24,50 @@ export default function Home(){
     const [customer, setCustomer] = useState([])
 
     useEffect(() =>{
-        listCustomer();
+
+            listCustomer();
+     
     },[])
 
     async function listCustomer() {
-        const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/customer.php');
-        setCustomer(reqs.data.result)
-        console.log(reqs.data.result)
+        try{
+            const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/customer.php');
+            if(reqs.data.sucess == true){
+                setCustomer(reqs.data.result)
+            } else {
+                setCustomer([])
+            }
+        } catch(err) {
+            console.log(err)
+        }
+        
+        
     }
 
     async function infoCustomer(idCustomer, nameCustomer, addressCustomer, contactCustomer){
         navigation.navigate("Debts", {id: idCustomer, name: nameCustomer, address: addressCustomer, contact:contactCustomer})
     }
 
-    return(
+    function toggleMenu(){
+        if(openMenu == false){
+            setOpenMenu(true);
+        } else {
+            setOpenMenu(false)
+        }
+    }
+
+    setTimeout(() => {
+        listCustomer();
+    }, 1500)
+
+
+    return( 
         <View style={styles.container}>
             <StatusBar backgroundColor={'#1C1D21'} barStyle={'light-content'} />
             <Modal 
                 animationType="slide"
                 transparent={true} 
                 visible={openMenu}>
-
                 <SafeAreaView style={styles.modal}>
 
                     <View style={styles.menuContainer}>
@@ -83,7 +106,7 @@ export default function Home(){
 
 
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => setOpenMenu(true)}>
+                <TouchableOpacity onPress={() => toggleMenu()}>
                     <Ionicons name="menu" size={40} color="#F98402"/>
                 </TouchableOpacity>
              <Image style={styles.logo} source={require('../../assets/logo.png')}/>
@@ -94,15 +117,17 @@ export default function Home(){
             <ScrollView>
                 <View style={styles.body}>
                     
-
-                    {customer.map(item =>(
+                    {customer.length != 0 ? customer.map(item =>(
                         <View style={styles.bodyBox}>
                         <Text style={styles.bodyText}>{item.name}</Text>
                         <TouchableOpacity style={styles.bodyButton} key={item.id} onPress={() => infoCustomer(item.id, item.name, item.address, item.contact)}>
                         <Ionicons name="folder-open-sharp" size={24} color="black" />
                         </TouchableOpacity>
                         </View>
-                    ))}
+                    )):<View style={styles.message}>
+                    <Ionicons name="alert-circle-sharp" size={24} color="#F98402"/>
+                    <Text style={styles.messageText}>Nenhum cliente cadastrado!</Text>
+                  </View>}
 
                 </View>
             </ScrollView>
@@ -231,5 +256,22 @@ const styles = StyleSheet.create({
         alignItems:'center',
         justifyContent:'center',
         borderRadius:5
-    }
+    },
+    message:{
+        flexDirection:"row",
+        gap:10,
+        justifyContent:  'center',
+        alignItems: 'center',
+        marginTop:30,
+        borderWidth:1,
+        borderColor: "#F98402",
+        padding:10,
+        paddingLeft:15,
+        paddingRight:15,
+        borderRadius:5
+      },
+      messageText:{
+        color:"#F98402",
+        fontWeight: 'bold'
+      }
 })

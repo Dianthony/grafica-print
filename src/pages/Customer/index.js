@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import config from "../../../config/config.json"
+import axios from 'axios';
 import { View, 
          Text, 
          StyleSheet, 
@@ -29,21 +30,47 @@ export default function Customer(){
     //Envia os dados de cadastro para o backend
 
     async function registerCustomer() {
-        let reqs = await fetch(config.urlRootNode+'create',{
-            method: 'POST',
-            headers:{
-                'Accept':'application/json',
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify({
-                nameCustomer: name,
-                addressCustomer: address,
-                contactCustomer: contact
-            })
-        })
+        if(name != "" || name != null || address != "" || address != null || contact != "" || contact != null){
+            try{
+                const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/addcustomer.php?name='+name+'&address='+address+'&contact='+contact);
+                let ress = await reqs;
+    
+                if(ress){
+                    setMessage('CADASTRADO COM SUCESSO!')
+                    setTimeout(()=>{
+                        setMessage(null)
+                    }, 3000)
+                }else{
+                setMessage('Erro desconhecido')
+                setTimeout(()=>{
+                    setMessage(null)
+                }, 3000)
+                }
+            } catch(err){
+                console.log(err)
+            }
+        } else {
+            if(ress){
+                setMessage('PREENCHA TODOS OS CAMPOS')
+                setTimeout(()=>{
+                    setMessage(null)
+                }, 3000)
+            }
+        }
+        
 
-        let ress = await reqs.json();
-        setMessage(ress)
+    }
+
+    function cleanField(){
+        this.setName()
+    }
+
+    function toggleMenu(){
+        if(openMenu == false){
+            setOpenMenu(true);
+        } else {
+            setOpenMenu(false)
+        }
     }
 
     return( 
@@ -92,7 +119,7 @@ export default function Customer(){
             </Modal>
 
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => setOpenMenu(true)}>
+                <TouchableOpacity onPress={() => toggleMenu()}>
                     <Ionicons name="menu" size={40} color="#F98402"/>
                 </TouchableOpacity>
              <Image style={styles.logo} source={require('../../assets/logo.png')}/>
@@ -102,7 +129,7 @@ export default function Customer(){
                 <Text style={styles.title}>CADASTRAR CLIENTE</Text>
 
                 {message && (
-                    <Text>{message}</Text>
+                    <View style={styles.message}><Ionicons name="alert-circle-sharp" size={24} color="#F98402"/><Text style={styles.messageText}>{message}</Text></View>
                 )}
 
                 <View style={styles.registerForm}>
@@ -266,5 +293,21 @@ const styles = StyleSheet.create({
         fontSize:20, 
         fontWeight:'bold'
     },
-
+    message:{
+        flexDirection:"row",
+        gap:10,
+        justifyContent:  'center',
+        alignItems: 'center',
+        marginTop:30,
+        borderWidth:1,
+        borderColor: "#F98402",
+        padding:10,
+        paddingLeft:15,
+        paddingRight:15,
+        borderRadius:5
+      },
+      messageText:{
+        color:"#F98402",
+        fontWeight: 'bold'
+      }
 })
