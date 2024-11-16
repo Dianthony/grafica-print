@@ -2,7 +2,7 @@
   "expo": {
     "name": "grafica-print",
     "slug": "grafica-print",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,13 +15,20 @@
       "supportsTablet": true
     },
     "android": {
+      "versionCode":2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1C1D21"
-      }
+      },
+      "package": "com.dianthony.graficaprint"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "083298b1-9006-4da2-9e76-6617491db755"
+      }
     }
   }
 }

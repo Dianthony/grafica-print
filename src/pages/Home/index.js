@@ -16,22 +16,28 @@ import config from "../../../config/config.json"
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+let renderCounter = 0;
+
 export default function Home(){
 
     const navigation = useNavigation();
+    
 
     const [openMenu, setOpenMenu] = useState(false)
     const [customer, setCustomer] = useState([])
 
     useEffect(() =>{
-
+        const focus = navigation.addListener('focus', () =>{
             listCustomer();
-     
-    },[])
+            console.log('Deu CErto essa poha')
+        })
+        return focus    
+    },[navigation])
 
     async function listCustomer() {
         try{
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/customer.php');
+            console.log(reqs)
             if(reqs.data.sucess == true){
                 setCustomer(reqs.data.result)
             } else {
@@ -56,9 +62,7 @@ export default function Home(){
         }
     }
 
-    setTimeout(() => {
-        listCustomer();
-    }, 1500)
+    console.log({render:renderCounter++})
 
 
     return( 
@@ -118,9 +122,9 @@ export default function Home(){
                 <View style={styles.body}>
                     
                     {customer.length != 0 ? customer.map(item =>(
-                        <View style={styles.bodyBox}>
+                        <View style={styles.bodyBox} key={item.id}>
                         <Text style={styles.bodyText}>{item.name}</Text>
-                        <TouchableOpacity style={styles.bodyButton} key={item.id} onPress={() => infoCustomer(item.id, item.name, item.address, item.contact)}>
+                        <TouchableOpacity style={styles.bodyButton}  onPress={() => infoCustomer(item.id, item.name, item.address, item.contact)}>
                         <Ionicons name="folder-open-sharp" size={24} color="black" />
                         </TouchableOpacity>
                         </View>

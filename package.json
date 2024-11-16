@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "ngrok": "ngrok http 80"
   },
   "dependencies": {
     "@react-navigation/native": "^6.1.18",
@@ -14,6 +15,7 @@
     "axios": "^1.7.7",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
+    "eas-cli": "^13.2.3",
     "expo": "~51.0.28",
     "expo-status-bar": "~1.12.1",
     "express": "^4.21.1",

@@ -312,9 +312,8 @@ export default function Debts({route}){
                        </View>
                        {/* VIEW QUE CONTÉM OS DADOS DO CLIENTE */}
                        <View style={styles.customerInfo}>
-                           <Text style={styles.primaryText}>Endereço: {item.address}</Text>
+                           <Text style={styles.primaryText}>Endereço: <Text style={styles.secondText}>{item.address}</Text></Text>
                            <Text style={styles.primaryText}>Contato: <Text style={styles.secondText}>{item.contact}</Text></Text>
-                           <Text style={styles.primaryText}>Débito Total: <Text style={styles.secondText}>R$ XXX,XX</Text></Text>
                        </View>
    
                        {/* VIEW DESTINADO AO REGISTRO DE DÉBITOS DO CLEINTE */}

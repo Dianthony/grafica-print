@@ -4,6 +4,7 @@ import { View, StyleSheet, StatusBar, Text, Image, Keyboard, TextInput, Touchabl
 import config from "../../../config/config.json"
 import { useNavigation } from "@react-navigation/native"
 import Ionicons from '@expo/vector-icons/Ionicons';
+import axios from 'axios';
 
 export default function SingIn(){
 
@@ -23,32 +24,28 @@ export default function SingIn(){
         }, 3000)
       }
       else {
-        let reqs = await fetch(config.urlRootPhp+'PROJETOS/grafica-print/Controller.php',{
-          method: 'POST',
-              headers:{
-                  'Accept':'application/json',
-                  'Content-Type':'application/json'
-              },
-              body: JSON.stringify({
-                  loginAdmin: login,
-                  passwordAdmin: password
-              })
-        });
+
+        try {
+          const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/Controller.php?login='+login+'&password='+password)
+          let ress = reqs.data.sucess;
   
-        let ress = await reqs.json();
-  
-        Keyboard.dismiss();
-  
-        
-  
-        if(ress){
-          navigation.navigate('Home')
-        }else{
-          setMessage('Credenciais Inválidas!')
-          setTimeout(()=>{
-            setMessage(null)
-          }, 3000)
-        } 
+          Keyboard.dismiss();
+
+          console.log(ress)
+          
+          if(ress == true){
+            navigation.navigate('Home')
+          }else{
+            setMessage('Credenciais Inválidas!')
+            setTimeout(()=>{
+              setMessage(null)
+            }, 3000)
+          } 
+          
+        } catch (error) {
+          console.log(error)
+        }
+      
       }
     }
 

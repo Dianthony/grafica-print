@@ -9,7 +9,7 @@ import { View,
          SafeAreaView, 
          TouchableOpacity, 
          Image, 
-         Modal,
+         Modal,Keyboard,
          TextInput } from 'react-native';
 
 import { useNavigation } from "@react-navigation/native"
