@@ -35,7 +35,7 @@ for($i=0; $i < count($debt); $i++){
 if(count($debt) > 0){
     $result = json_encode(array('sucess'=>true, 'result'=> $dados, 'customer'=>$dadosCustomer));
 }else{
-    $result = json_encode(array('sucess'=>false, 'result'=> '0'));
+    $result = json_encode(array('sucess'=>false, 'result'=> '0', 'customer'=>$dadosCustomer));
 }
 echo $result;
 
