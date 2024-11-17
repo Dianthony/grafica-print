@@ -1,79 +1,65 @@
+/* IMPORTAÇÕES DA PÁGINA */
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { View, 
-         Text, 
-         StyleSheet, 
-         StatusBar, 
-         SafeAreaView, 
-         TouchableOpacity, 
-         Image, 
-         Modal,
-         ScrollView } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Image, Modal, ScrollView } from 'react-native';
 
-import { useNavigation } from "@react-navigation/native"
-import axios from 'axios';
-import config from "../../../config/config.json"
-
+import { useNavigation } from "@react-navigation/native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-let renderCounter = 0;
+import config from "../../../config/config.json";
+import axios from 'axios';
 
+/* COMPONENTE HOME */
 export default function Home(){
 
     const navigation = useNavigation();
     
-
     const [openMenu, setOpenMenu] = useState(false)
     const [customer, setCustomer] = useState([])
 
+    /* USEEFFECT QUE ATUALIZA A LISTA DE CLIENTES SEMPRE QUE A PAGINA RECEBE O EVENTO 'FOCUS' */
     useEffect(() =>{
         const focus = navigation.addListener('focus', () =>{
             listCustomer();
-            console.log('Deu CErto essa poha')
+            setOpenMenu(false)
         })
         return focus    
     },[navigation])
 
+    /* FUNÇÃO QUE FAZ A REQUISÃO À API PARA LISTAR OS CLIENTES CADASTRADOS NA EMPRESA */
     async function listCustomer() {
         try{
+            /* CHAMANDO A API */
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/customer.php');
-            console.log(reqs)
+            
             if(reqs.data.sucess == true){
+                /* SE A API RETORNAR ALGUM VALOR VERDADEIRO, ENTÃO O SETCOSTUMER, QUE É UM ARRAY VAZIO, SERÁ PREENCHIDO COM OS DADOS VINDOS DA API */
                 setCustomer(reqs.data.result)
             } else {
+                /* SE A API RETRONAR ALGUM VALOR FALSO, ENTÃO O SETCOSTUMER PERMANECERÁ COMO ARRAY VAZIO */
                 setCustomer([])
             }
         } catch(err) {
             console.log(err)
-        }
-        
-        
+        } 
     }
 
+    /* FUNÇÃO QUE DIRECIONA O ADMIN PARA A PÁGINA DE DÉBITOS DO CLIENTE SELECIONADO, ENVIANDO SUAS INFORMAÇÕES PARA A PÁGINA REFERIDA */
     async function infoCustomer(idCustomer, nameCustomer, addressCustomer, contactCustomer){
         navigation.navigate("Debts", {id: idCustomer, name: nameCustomer, address: addressCustomer, contact:contactCustomer})
     }
 
-    function toggleMenu(){
-        if(openMenu == false){
-            setOpenMenu(true);
-        } else {
-            setOpenMenu(false)
-        }
-    }
-
-    console.log({render:renderCounter++})
-
-
     return( 
+        /* VIEW PRINCIPAL DA PÁGINA */
         <View style={styles.container}>
-            <StatusBar backgroundColor={'#1C1D21'} barStyle={'light-content'} />
-            <Modal 
-                animationType="slide"
-                transparent={true} 
-                visible={openMenu}>
-                <SafeAreaView style={styles.modal}>
 
+            <StatusBar backgroundColor={'#1C1D21'} barStyle={'light-content'} />
+
+            {/* MODAL DE MENU, INICIALMENTE ESCONDIDA POR OPENMENU(FALSE) E APRESENTADA QUANDO OPENMENU(TRUE) */}
+            <Modal animationType="slide" transparent={true} visible={openMenu}>
+
+                <SafeAreaView style={styles.modal}>
+                    {/* VIEW CABEÇALHO MENU E BOTÃO DE FECHAR MENU */}
                     <View style={styles.menuContainer}>
                         <View style={styles.menuHeader}>
                             <Text style={styles.menuHeaderTitle}>Menu</Text>
@@ -82,23 +68,27 @@ export default function Home(){
                                 <Ionicons name="close" size={40} color="#1C1D21" />
                             </TouchableOpacity>
                         </View>
+                        {/* VIEW DE CORPO DO MENU */}
                         <View style={styles.menuBody}>
+                            {/* BOTÃO QUE REDIRECIONA PARA A PÁGINA HOME */}
                             <TouchableOpacity style={styles.btnMenu}>
                             <Ionicons name="home-sharp" size={24} color="#1C1D21" />
                                 <Text style={styles.btnMenuText}>Home</Text>
                             </TouchableOpacity>
-
+                            {/* BOTÃO QUE REDIRECIONA PARA A PÁGINA CUSTOMER */}
                             <TouchableOpacity style={styles.btnMenu} onPress={() => navigation.navigate('Customer')}>
                                 <Ionicons name="person-add-sharp" size={24} color="#1C1D21" />                        
                                 <Text style={styles.btnMenuText}>Cadastrar Cliente</Text>
                             </TouchableOpacity>
                         </View>
+                        {/* BOTÃO DE LOGOUT QUE REDIRECIONA PARA A PÁGINA SIGNIN */}
                         <View style={styles.menuFooter}>
                             <TouchableOpacity style={styles.btnMenu} onPress={() => navigation.navigate('SignIn')}>
                             <Ionicons name="exit" size={24} color="#1C1D21" />
                             <Text style={styles.btnMenuText}>Sair</Text>
                             </TouchableOpacity>
                         </View>
+                        {/* VIEW DESENVOLVEDOR*/}
                         <View style={styles.developedBy}>
                             <Text style={styles.developedByText}> Developed by Dianthony Alves</Text>
                         </View>
@@ -108,44 +98,52 @@ export default function Home(){
 
             </Modal>
 
-
+            {/* VIEW DE CABEÇALHO DA PÁGINA COM BOTÃO DE ABRIR MENU E LOGO DA EMPRESA */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => toggleMenu()}>
+                <TouchableOpacity onPress={() => setOpenMenu(true)}>
                     <Ionicons name="menu" size={40} color="#F98402"/>
                 </TouchableOpacity>
              <Image style={styles.logo} source={require('../../assets/logo.png')}/>
             </View>
 
+            {/* TÍTULO DA PÁGINA */}
             <Text style={styles.title}>MEUS CLIENTES</Text>
 
             <ScrollView>
+                {/* VIEW BODY DA PÁGINA */}
                 <View style={styles.body}>
-                    
+
+                    {/* PREENCHIMENTO DA LISTA */}
                     {customer.length != 0 ? customer.map(item =>(
+                        /* CASO A LISTA RETORNE ALGUM VALOR, SERÁ APRESENTADO A VIEW A BAIXO COM O BOTÃO QUE REDIRECIONA PARA A PÁGINA DE DÉBITO COM AS INFORMAÇÕES DO CLIENTE */
                         <View style={styles.bodyBox} key={item.id}>
-                        <Text style={styles.bodyText}>{item.name}</Text>
-                        <TouchableOpacity style={styles.bodyButton}  onPress={() => infoCustomer(item.id, item.name, item.address, item.contact)}>
-                        <Ionicons name="folder-open-sharp" size={24} color="black" />
-                        </TouchableOpacity>
+                            <Text style={styles.bodyText}>{item.name}</Text>
+                            <TouchableOpacity style={styles.bodyButton}  onPress={() => infoCustomer(item.id, item.name, item.address, item.contact)}>
+                            <Ionicons name="folder-open-sharp" size={24} color="black" />
+                            </TouchableOpacity>
                         </View>
-                    )):<View style={styles.message}>
-                    <Ionicons name="alert-circle-sharp" size={24} color="#F98402"/>
-                    <Text style={styles.messageText}>Nenhum cliente cadastrado!</Text>
-                  </View>}
+                    )):/* CASO A LISTA SEJA UM ARRAY VAZIO, APARECERÁ A MENSAGEM ABAIXO */
+                    <View style={styles.message}>
+                        <Ionicons name="alert-circle-sharp" size={24} color="#F98402"/>
+                        <Text style={styles.messageText}>Nenhum cliente cadastrado!</Text>
+                    </View>}
 
                 </View>
             </ScrollView>
+
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    // ESTILO DA PAGINA
     container:{
         flex:1,
         backgroundColor: '#1C1D21',
         padding:5
     },
 
+    //ESTILO DA MODAL MENU
     modal:{
         backgroundColor:'#00000099',
         height: '100%'
@@ -210,6 +208,7 @@ const styles = StyleSheet.create({
         color:'#7D4F1B'
     },
 
+    //ESTILO DA VIEW DE CABEÇALHO
     header:{
         flexDirection:"row",
         justifyContent:'space-between',
@@ -224,6 +223,8 @@ const styles = StyleSheet.create({
         display:'flex',
         marginLeft: 1,
     },
+
+    //ESTILO DA VIEW DO BODY
     body:{
         justifyContent:'center',
         alignItems:'center'

@@ -1,183 +1,195 @@
+/* IMPORTAÇÕES DA PÁGINA */
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { View, 
-         Text, 
-         StyleSheet, 
-         StatusBar, 
-         TouchableOpacity,
-         Modal,
-         SafeAreaView, 
-         Image, 
-         ScrollView,
-         TextInput } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, TouchableOpacity, Modal, SafeAreaView, Image, ScrollView, TextInput } from 'react-native';
 
 import { useNavigation } from "@react-navigation/native"
-import axios from 'axios';
-import config from "../../../config/config.json"
-
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+import config from "../../../config/config.json"
+import axios from 'axios';
+
+/* COMPONENTE DEBTS COM PARAMETRO ROUTE QUE RECEBE AS INFORMAÇÕES DO CLIENTE DESEJA VINDO DA PÁGINA DE HOME */
 export default function Debts({route}){
 
     const navigation = useNavigation();
 
     const[message, setMessage] = useState();
 
+    /* STATE PARA EDIÇÃO DE DADOS DO CLINTE */
     const [edit, setEdit] = useState(false);
     const [debt, setDebt] = useState(false);
 
+    /* STATE PARA EDIÇÃO DE DADOS DO CLINTE */
     const [listDebt, setListDebt] = useState([])
     const [customer, setCustomer] = useState([])
 
-    const [newName, setNewName] = useState(null)
-    const [newAddress, setNewAddress] = useState(null)
-    const [newContact, setNewContact] = useState(null)
+    const [newName, setNewName] = useState()
+    const [newAddress, setNewAddress] = useState()
+    const [newContact, setNewContact] = useState()
 
     const [debtTitle, setDebtTitle] = useState(null)
     const [debtDesc, setDebtDesc] = useState(null)
     const [debtValue, setDebtValue] = useState(null)
     const [debtDate, setDebtDate] = useState(null)
 
-    
-
+    /* USEEFFECT QUE ATUALIZA A LISTA DE DÉBITOS DO CLIENTE SEMPRE QUE A PÁGINA É ATUALIZADA */
     useEffect(() =>{
         saerchCustomer();
     },[])
 
+    /* FUNÇÃO QUE FAZ A REQUISÃO À API PARA BUSCA DE DADOS DO CLIENTE E LISTAR OS DÉBITOS DO CLIENTE PASSANDO O PARAMETRO DE ID DO CLIENTE VINDO DA PÁGINA DE HOME */
     async function saerchCustomer() {
         try{
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/debts.php?id='+route.params.id);
 
             if(reqs.data.sucess == true){
+                /* SE A API RETORNAR ALGUM VALOR VERDADEIRO, ENTÃO O SETDEBTLIST, QUE É UM ARRAY VAZIO, SERÁ PREENCHIDO COM OS DADOS VINDOS DA API */
                 setListDebt(reqs.data.result)
             } else {
+                /* SE A API RETRONAR ALGUM VALOR FALSO, ENTÃO O SETDEBTLIST PERMANECERÁ COMO ARRAY VAZIO */
                 setListDebt([])
             }
-            
+            /* SE A API RETORNAR ALGUM VALOR VERDADEIRO, ENTÃO O SETCUSTOME, QUE É UM ARRAY VAZIO, SERÁ PREENCHIDO COM OS DADOS DO CLIENTE VINDOS DA API */    
             setCustomer(reqs.data.customer)
-        } catch (err) {
+        } 
+        catch (err) {
             console.log(err)
         }
         
     }
 
+    /* FUNÇÃO QUE FAZ A REQUISÃO À API PARA ATUALIZAR OS DADOS DO CLIENTE CONFORME OS DADOS PASSADOS */
     async function updateCustomer() {
         try{
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/updatecustomer.php?id='+route.params.id+'&newname='+newName+'&newaddress='+newAddress+'&newcontact='+newContact);
+            /* CHAMA A FUNÇÃO DE BUSCAR CLIENTE */
             saerchCustomer();
+            /*FECHA A MODAL DE ATUALIZAÇÃO*/
             setEdit(false)
 
-            let ress = await reqs;
+            let ress = reqs;
 
             if(ress){
+                /* SE TIVER DADO CERTO RETORNARÁ UMA MESSAGEM COM DURAÇÃO DE 3s*/
                 setMessage('Alterado com sucesso!')
                 setTimeout(()=>{
                     setMessage(null)
                 }, 3000)
             }else{
+                /* SE TIVER DADO ERRADO RETORNARÁ UMA MESSAGEM COM DURAÇÃO DE 3s*/
             setMessage('Erro desconhecido')
             setTimeout(()=>{
                 setMessage(null)
             }, 3000)
             }
-        } catch (err) {
+
+        } 
+        catch (err) {
             console.log(err)
         }
 
     }
 
+    /* FUNÇÃO QUE FAZ A REQUISÃO À API PARA DELETAR OS DADOS PESSOAIS E OS DÉBTIOS DO CLIENTE RETORNANDO PARA A PÁGINA DE HOME */
     async function deleteCustomer() {
         try{
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletecustomer.php?id='+route.params.id);
             navigation.navigate('Home')
 
-            let ress = await reqs;
-
-            if(ress){
-                setMessage('Deletado com sucesso!')
-                setTimeout(()=>{
-                    setMessage(null)
-                }, 3000)
-            }else{
-            setMessage('Erro desconhecido')
-            setTimeout(()=>{
-                setMessage(null)
-            }, 3000)
-            }
-        } catch (err) {
+        } 
+        catch (err) {
             console.log(err)
         }
 
     }
 
+    /* FUNÇÃO QUE FAZ A REQUISÃO À API PARA ADICIONAR DÉBTIOS AO CLIENTE */
     async function addDebt() {
         try{
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/adddebt.php?id='+route.params.id+'&title='+debtTitle+'&desc='+debtDesc+'&value='+debtValue+'&date='+debtDate);
+            /* CHAMA A FUNÇÃO DE BUSCAR CLIENTE */
             saerchCustomer();
+            /*FECHA O MODAL DE DEBÍTOS*/
             setDebt(false)
-        } catch (err) {
+
+        } 
+        catch (err) {
             console.log(err)
         }
         
     }
 
+    /* FUNÇÃO QUE FAZ A REQUISÃO À API PARA DELETAR O DÉBITO DO CLIENTE COM O ID DO DEBITO RECEBIDO COMO PARAMETRO */
     async function daleteDebt(idDebt) {
         try{
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletedebt.php?iddebt='+idDebt);
+            /* CHAMA A FUNÇÃO DE BUSCAR CLIENTE */
             saerchCustomer();
 
             let ress = await reqs;
 
             if(ress){
+                /* SE TIVER DADO CERTO RETORNARÁ UMA MESSAGEM COM DURAÇÃO DE 3s*/
                 setMessage('Deletado com sucesso!')
                 setTimeout(()=>{
                     setMessage(null)
                 }, 3000)
             }else{
+                /* SE TIVER DADO ERRADO RETORNARÁ UMA MESSAGEM COM DURAÇÃO DE 3s*/
             setMessage('Erro desconhecido')
             setTimeout(()=>{
                 setMessage(null)
             }, 3000)
             }
-        } catch (err) {
+
+        } 
+        catch (err) {
             console.log(err)
         }
 
     }
 
+    /* FUNÇÃO QUE FAZ A REQUISÃO À API PARA DELETAR TODOS OS DÉBITO DO CLIENTE COM O ID DO DEBITO RECEBIDO COMO PARAMETRO */
     async function deleteAllDebts() {
         try{
             const reqs = await axios.get(config.urlRootPhp+'PROJETOS/grafica-print/deletealldebts.php?id='+route.params.id);
+            /* CHAMA A FUNÇÃO DE BUSCAR CLIENTE */
             saerchCustomer();
 
         let ress = await reqs;
 
         if(ress){
+            /* SE TIVER DADO CERTO RETORNARÁ UMA MESSAGEM COM DURAÇÃO DE 3s*/
             setMessage('CONTA QUITADA!')
             setTimeout(()=>{
                 setMessage(null)
               }, 3000)
         }else{
+            /* SE TIVER DADO ERRADO RETORNARÁ UMA MESSAGEM COM DURAÇÃO DE 3s*/
           setMessage('Erro desconhecido')
           setTimeout(()=>{
             setMessage(null)
           }, 3000)
         }
-        } catch (err){
+        } 
+        catch (err){
             console.log(err)
         }
     }
     
+    /* CRIAÇÃO DO COMPONENTE RENDER QUE É GERADO CONFORME O NUMERO DE DÉBITOS DO CLIENTE RECEBIDOS PELA FUNÇÃO SEARCHCUSTOMER */
     const Render = () =>{
+        /* SE O TAMANHO DO ARRAY FOR MAIOR QUE 0, ENTÃO RETORNARÁ */
         if (listDebt.length != 0){
             return listDebt?.map(item  => (
-                <View style={styles.register}>
+                <View style={styles.register} key={item.id}>
                 
-                <View style={styles.customerRegister}>
+                <View style={styles.customerRegister} >
                     <Text style={styles.customerRegisterTitle}>{item.title}</Text>
                     <View style={styles.customerRegisterActions}>
-                        {/* BOTÃO PARA DELETAR O DÉBITO EM ESPECÍFICO E DESCONTAR DA SUA CONTA */}
-                        <TouchableOpacity style={styles.bodyButton} key={item.id} onPress={() => daleteDebt(item.id)}>
+                        {/* BOTÃO PARA DELETAR O DÉBITO EM ESPECÍFICO */}
+                        <TouchableOpacity style={styles.bodyButton}  onPress={() => daleteDebt(item.id)}>
                             <Ionicons name="trash-sharp" size={24} color="black" />
                         </TouchableOpacity>
                     </View>
@@ -192,7 +204,9 @@ export default function Debts({route}){
             </View>
             
             ))
-        } else if(listDebt.length == 0) {
+        } 
+        /* SE O TAMANHO DO ARRAY ESTIVER VAZIO RETRONARÁ */
+        else if(listDebt.length == 0) {
             return<View style={styles.message}><Ionicons name="alert-circle-sharp" size={24} color="#F98402"/><Text style={styles.secondText}>Nenhum Registro Encontrado</Text></View>
         }
     }
@@ -215,7 +229,7 @@ export default function Debts({route}){
                         </View>
                         <View style={styles.modalBody}>
                             {customer?.map(item =>(
-                                <View style={styles.bodyForm}>
+                                <View style={styles.bodyForm} key={item.id}>
                                 <View style={styles.form}>
                                     <Text style={styles.formText} >Nome</Text>
                                     <TextInput style={styles.formInput} onChangeText={(newName) => setNewName(newName)}><Text style={styles.formTextInput}>{item.name}</Text></TextInput>
@@ -295,7 +309,7 @@ export default function Debts({route}){
             <ScrollView>
                 {/* VIEW DE CABEÇALHO DO CORPO DA PÁGINA */}
                 {customer?.map(item => (
-                       <View style={styles.body}>
+                       <View style={styles.body} key={item.id}>
                         {message && (
                             <View style={styles.message}>
                             <Ionicons name="alert-circle-sharp" size={24} color="#F98402"/>
